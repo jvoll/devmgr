@@ -2,3 +2,8 @@ This is the server side and web portal for the Mozilla
 Device Manager prototype.
 
 Written by: Jason Voll
+
+Superuser info for Django auth system:
+user: jason
+email: jvoll@mozilla.com
+password: password

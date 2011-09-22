@@ -1,0 +1,36 @@
+<h1>Device List</h1>
+{% if device_list %}
+    <ul>
+    {% for device in device_list %}
+	<li>
+	    <form action="/devices/{{ device.id }}/wipe/" method="post">
+	    {% csrf_token %}
+	    <h3>{{ device.name }}</h3>
+	    <b>Location Information</b>
+	    {% if device.allow_tracking %}
+		<br>Latitude: {{ device.latitude }}
+		<br>Longitude: {{ device.longitude }}
+	    {% else %}
+		Tracking is not enabled for this device.
+	    {% endif %}
+
+	    <br><b>Wipe Information</b>
+	    {% if device.wipe_requested %}
+		<br>Wipe initiated
+		{% if device.is_wiped %}
+		    <br>Status: Completed
+		{% else %}
+		    <br>Status: Pending
+		{% endif %}
+	    {% else %}
+		<br>Wipe not requested
+	    {% endif %}
+	    <br>
+	    <input type="submit" value="Wipe device" /> 
+	    </form>
+	</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No devices are registered.</p>
+{% endif %}
