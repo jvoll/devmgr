@@ -10,3 +10,15 @@ class Device(models.Model):
 
     def __unicode__(self):
 	return self.name
+
+    def to_dict(self):
+	dict = {
+	    'id': self.id,
+	    'name': self.name,
+	    'latitude': self.latitude,
+	    'longitude': self.longitude,
+	    'allow_tracking': self.allow_tracking,
+	    'is_wiped': self.is_wiped,
+	    'wipe_requested': self.wipe_requested
+	}
+	return dict

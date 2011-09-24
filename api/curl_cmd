@@ -1,0 +1,4 @@
+curl -i -X POST -H 'Content-Type: application/json' -d '{"name":"test"}' http://127.0.0.1:8000/api/devices/register/ >
+output.html
+
+curl -i -H "Content-type: application/json" -X PUT -d '{"allow_tracking":"False"}' http://127.0.0.1:8000/api/devices/3/location
