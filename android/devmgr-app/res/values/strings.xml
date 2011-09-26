@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, StartActivity!</string>
+    <string name="app_name">Device manager</string>
+    
+    <!-- Control Labels -->
+    <string name="tvWipeStatus">Wipe status: </string>
+    <string name="tvCurrentLocation">Current location</string>
+    <string name="tvLatitude">Latitude: </string>
+    <string name="tvLongitude">Longitude: </string>
+    <string name="tvRegister">This device is not registered with the Mozilla device manager.</string>
+    <string name="tvRegistered">This device is registered with the Mozilla device manager. You can now (optionally) track your device or perform a remote wipe.</string>
+    
+    <!--  Buttons -->
+    <string name="btRegister">Register</string>
+    
+    <!-- Check Boxes -->
+    <string name="cbAllowTrack">Allow tracking of this device</string>
+    
+    <!-- Status Messages -->
+    <string name="smDeviceWiped">Device wiped</string>
+    <string name="smDeviceNormal">No wipe requested</string>
+    
+    <!-- Error Messages -->
+    
+    <!-- Dialogues -->
+    
+    <!-- Defaults -->
+    <string name="dfLatLong">0.0000</string>
+</resources>
