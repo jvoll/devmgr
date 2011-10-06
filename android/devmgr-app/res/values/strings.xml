@@ -8,8 +8,11 @@
     <string name="tvCurrentLocation">Current location</string>
     <string name="tvLatitude">Latitude: </string>
     <string name="tvLongitude">Longitude: </string>
-    <string name="tvRegister">This device is not registered with the Mozilla device manager.</string>
+    <string name="tvRegister">This device is not registered with the Mozilla device manager.Enter a device name and click Register to setup Device Manager.</string>
     <string name="tvRegistered">This device is registered with the Mozilla device manager. You can now (optionally) track your device or perform a remote wipe.</string>
+    <string name="tvNameRegister">Device name: </string>
+    <string name="tvNameRegistered">Device name set to: </string>
+    <string name="tvNameValue">No name</string>
     
     <!--  Buttons -->
     <string name="btRegister">Register</string>
@@ -22,8 +25,10 @@
     <string name="smDeviceNormal">No wipe requested</string>
     
     <!-- Error Messages -->
+    <string name="emRegisterFailed">Registering device failed. Please make sure you are connected to the Internet or try again later.</string>
     
-    <!-- Dialogues -->
+    <!-- Messages -->
+    <string name="mgEnterName">Enter a device name before registering your device.</string>
     
     <!-- Defaults -->
     <string name="dfLatLong">0.0000</string>

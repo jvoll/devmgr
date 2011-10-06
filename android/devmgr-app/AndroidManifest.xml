@@ -3,9 +3,55 @@
       package="com.android.dm"
       android:versionCode="1"
       android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="7" />
-
+    <uses-sdk android:minSdkVersion="8" />
+    
+    <!-- Permissions -->
+    <!-- Internet and both location providers -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    
+    <!-- Only this app can receive the c2d messages and registration result -->
+    <permission android:name="com.android.dm.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.android.dm.permission.C2D_MESSAGE" />
+    
+    <!-- Permission to register and receive messages -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    
+    <!-- Other permissions used with c2dm -->
+    <!-- uses-permission android:name="android.permission.WAKE_LOCK" /-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
     <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <!-- Only C2DM servers can send messages for the app. (Stops other apps from potentially generating messages -->
+        <receiver android:name=".C2DMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND">
+            <!-- Intent to receive the actual message -->
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.android.dm" />
+            </intent-filter>
+            <!-- Intent to receive the registration id -->
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="com.android.dm" />
+            </intent-filter>
+        </receiver>
+        
+        <!-- Services used for c2dm -->
+	    <service android:name=".c2dm.registration.RegistrationIDReceiver" android:enabled="true" android:exported="true">
+	        <intent-filter>
+	            <action android:name="com.android.dm.intent.REGISTER" />
+	            <category android:name="com.android.dm" />
+	        </intent-filter>
+	    </service>
+	    <service android:name=".c2dm.service.C2DMService">
+	        <intent-filter>
+	            <action android:name="com.android.dm.intent.START_SERVICE" />
+	            <category android:name="com.android.dm" />
+	        </intent-filter>
+	    </service>
+        
+        <!-- Declaration for main activity, set it to launch when app is started -->    
         <activity android:name=".StartActivity"
                   android:label="@string/app_name">
             <intent-filter>

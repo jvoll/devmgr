@@ -25,9 +25,17 @@
 	    {% else %}
 		<br>Wipe not requested
 	    {% endif %}
+	    <br><b>Push Enabled</b>
+	    {% if device.google_id != "" %}
+		<br>Yes: {{ device.google_id }}
+	    {% else %}
+		<br>No
+	    {% endif %}
 	    <br>
 	    <input type="submit" value="Wipe device" /> 
 	    </form>
+	    <form action= "/devices/{{ device.id }}/send/" method="post">
+	    <input type="submit" value="Send Push Notification" />
 	</li>
     {% endfor %}
     </ul>

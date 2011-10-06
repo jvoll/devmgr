@@ -13,33 +13,70 @@
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content">
-	        <Button 
-	            android:id="@+id/btRegister"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-	            android:text="@string/btRegister">
-	        </Button>
             <TextView
                 android:id="@+id/tvRegister"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:layout_toLeftOf="@id/btRegister"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginBottom="10dp"
                 android:text="@string/tvRegister">
             </TextView>
+            <TextView 
+                android:id="@+id/tvNameRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvRegister"
+                android:layout_alignParentLeft="True"
+                android:text="@string/tvNameRegister">
+            </TextView>
+	        <Button 
+	            android:id="@+id/btRegister"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_below="@id/tvRegister"
+	            android:layout_alignParentRight="true"
+	            android:text="@string/btRegister">
+	        </Button>
+            <EditText 
+                android:id="@+id/etName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvRegister"
+                android:layout_toRightOf="@id/tvNameRegister"
+                android:layout_toLeftOf="@id/btRegister"
+                android:minWidth="70dp">
+            </EditText>
         </RelativeLayout>
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/tvRegistered"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginBottom="10dp"
                 android:text="@string/tvRegistered">
             </TextView>
-        </LinearLayout>
+            <TextView 
+                android:id="@+id/tvNameRegistered"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvRegistered"
+                android:layout_alignParentLeft="true"
+                android:text="@string/tvNameRegistered">
+            </TextView>
+            <TextView 
+                android:id="@+id/tvNameValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tvRegistered"
+                android:layout_toRightOf="@id/tvNameRegistered"
+                android:text="@string/tvNameValue">
+            </TextView>
+        </RelativeLayout>
     </ViewSwitcher>
     <CheckBox
         android:id="@+id/cbAllowTrack"
