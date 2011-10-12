@@ -35,20 +35,21 @@ public class Caller {
 	// Webservice Information
 	// TODO: use a config file for this stuff
 	private static final String API_URL = "http://10.0.2.2:8000/api/";
-	private static final String REGISTER_API = "devices/register";
-	private static final String REGISTER_C2DM_ID_API ="devices/c2dm/%id/register";
-	private static final String LOCATION_API = "devices/%id/location";
-	private static final String WIPE_API = "devices/%id/wipestatus";
-	private static final String LOCATION_FREQUENCY_API = "devices/%id/trackfrequency";
+	private static final String REGISTER_API = "register";
+	private static final String REGISTER_C2DM_ID_API ="c2dm/%id/register";
+	private static final String LOCATION_API = "%id/location";
+	private static final String ALLOW_TRACK_API = "%id/allowtrack";
+	private static final String WIPE_API = "%id/wipestatus";
+	private static final String LOCATION_FREQUENCY_API = "%id/trackfrequency";
 	
 	// Disable ability to instantiate this class
 	private Caller() {}
 
 	// Register a device using an Http Create request
-	public static boolean registerDevice(Context context, String deviceName, boolean allowTracking) {
+	public static boolean registerDevice(Context context, String deviceName) {
 		
 		// Prepare the request
-		String jsonString = "{\"name\":\"" + deviceName + "\", \"allow_tracking\":\"" + allowTracking + "\"}";
+		String jsonString = "{\"name\":\"" + deviceName + "\"}";
 		HttpPost httpPost = new HttpPost(API_URL + REGISTER_API);
 		httpPost.addHeader("Content-Type", "application/json");
 		try {
@@ -98,7 +99,8 @@ public class Caller {
 	public static boolean updateLocation(Context context, Location location) {
 		
 		// Prepare the request
-		String jsonString = "{\"latitude\":" + location.getLatitude() + ", \"longitude\":" + location.getLongitude() + ", \"loc_timestamp\":" + location.getTime() + "}";
+		String jsonString = "{\"latitude\":" + location.getLatitude() + ", \"longitude\":" + location.getLongitude()
+							+ ", \"loc_timestamp\":" + location.getTime() + "}";
 		HttpPut httpPut = new HttpPut(API_URL + LOCATION_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
@@ -119,7 +121,7 @@ public class Caller {
 		
 		// Prepare the request
 		String jsonString = "{\"allow_tracking\":\"" + allowTrack + "\"}";
-		HttpPut httpPut = new HttpPut(API_URL + LOCATION_API.replace("%id", getDeviceID(context)));
+		HttpPut httpPut = new HttpPut(API_URL + ALLOW_TRACK_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
 			httpPut.setEntity(new StringEntity(jsonString));

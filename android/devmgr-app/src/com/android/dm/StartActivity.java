@@ -42,6 +42,7 @@ public class StartActivity extends Activity {
         vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
         vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
         cbAllowTrack = (CheckBox) findViewById(R.id.cbAllowTrack);
+        cbAllowTrack.setEnabled(false);
         if (!Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME).equalsIgnoreCase("")) {
         	View button = vsRegister.getCurrentView().findViewById(R.id.btRegister);
         	if (button != null) {
@@ -49,6 +50,7 @@ public class StartActivity extends Activity {
         	}
         	TextView tvNameValue = (TextView) findViewById(R.id.tvNameValue);
 			tvNameValue.setText(Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME));
+			cbAllowTrack.setEnabled(true);
 	        cbAllowTrack.setChecked(Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK));
         }
         
@@ -71,14 +73,12 @@ public class StartActivity extends Activity {
     		return;
     	}
     	
-    	// Get allow track settings
-    	CheckBox cbAllowTrack = (CheckBox) findViewById(R.id.cbAllowTrack);
-    	
     	// Call the api to register the device
-		if ( Caller.registerDevice(this, name.trim(), cbAllowTrack.isChecked()) ) {
+		if (Caller.registerDevice(this, name.trim())) {
 			
 			// Switch the view
 			vsRegister.showNext();
+			cbAllowTrack.setEnabled(true);
 			TextView tvNameValue = (TextView) findViewById(R.id.tvNameValue);
 			tvNameValue.setText(name);
 			

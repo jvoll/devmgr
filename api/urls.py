@@ -17,18 +17,20 @@ auth = HttpBasicAuthentication()
 
 device_handler = Resource(DeviceHandler)
 device_location_handler = Resource(DeviceLocationHandler)
+device_allow_track_handler = Resource(DeviceAllowTrackHandler)
 device_wipe_handler= Resource(DeviceWipeHandler)
 device_c2dm_register_handler = Resource(DeviceC2DMRegisterHandler)
 device_c2dm_send_handler = Resource(C2DMSendHandler)
 device_loc_frequency_handler = Resource(LocFrequencyHandler)
 
 urlpatterns = patterns('',
-    (r'^devices/register$', device_handler),
-    (r'^devices/(?P<device_id>\d+)$', device_handler),
-    (r'^devices/$', device_handler),
-    (r'^devices/(?P<device_id>\d+)/location$', device_location_handler),
-    (r'^devices/(?P<device_id>\d+)/wipestatus$', device_wipe_handler),
-    (r'^devices/c2dm/(?P<device_id>\d+)/register$', device_c2dm_register_handler),
-    (r'^devices/c2dm/(?P<device_id>\d+)/send$', device_c2dm_send_handler),
-    (r'^devices/(?P<device_id>\d+)/trackfrequency$', device_loc_frequency_handler),
+    (r'^register$', device_handler),
+    (r'^(?P<device_id>\d+)$', device_handler),
+    (r'^$', device_handler),
+    (r'^(?P<device_id>\d+)/location$', device_location_handler),
+    (r'^(?P<device_id>\d+)/allowtrack$', device_allow_track_handler),
+    (r'^(?P<device_id>\d+)/wipestatus$', device_wipe_handler),
+    (r'^c2dm/(?P<device_id>\d+)/register$', device_c2dm_register_handler),
+    (r'^c2dm/(?P<device_id>\d+)/send$', device_c2dm_send_handler),
+    (r'^(?P<device_id>\d+)/trackfrequency$', device_loc_frequency_handler),
 )

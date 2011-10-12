@@ -4,6 +4,8 @@ from piston.utils import rc, require_mime
 from devmgr.c2dm.c2dm_sender import C2DMSender
 import json
 
+# Handler for registering new devices
+# and getting general info on the registered devices
 class DeviceHandler(AnonymousBaseHandler):
     allowed_methods = ('GET','POST')
     model = Device
@@ -23,21 +25,20 @@ class DeviceHandler(AnonymousBaseHandler):
 	    return ret
 
     # Add a device
-    # TODO remove allow_tracking from this API since not used
-    # /api/devices/register json: name, allow_tracking
     def create(self, request):
 	j = json.loads(request.raw_post_data)
 
-	tracking = string_to_bool(j['allow_tracking'])
-
-	new_device = Device(name=j['name'], latitude=0.0, longitude=0.0,
-			    allow_tracking=tracking, is_wiped=False,
-			    wipe_requested=False, track_frequency=3600)
-
-	new_device.save()
-	resp=rc.CREATED
-	resp.content={'id':new_device.id}
-	return resp
+	if 'name' in j:
+	    new_device = Device(name=j['name'], latitude=0.0, longitude=0.0,
+			allow_tracking=False, is_wiped=False,
+			wipe_requested=False, track_frequency=3600,
+			loc_timestamp=0)
+	    new_device.save()
+	    resp=rc.CREATED
+	    resp.content={'id':new_device.id}
+	    return resp
+	else:
+	    return rc.BAD_REQUEST
 
 # Used to handle the update of a google c2dm id
 class DeviceC2DMRegisterHandler(AnonymousBaseHandler):
@@ -54,22 +55,16 @@ class DeviceC2DMRegisterHandler(AnonymousBaseHandler):
 
     # Add a Google c2dm id to a device
     def update(self, request, device_id):
-	print "tetest"
 	try:
 	    device = Device.objects.get(pk=device_id)
 	except Device.DoesNotExist:
 	    return rc.NOT_FOUND
 
-	print "got me a device!"
-	print device
-
 	j = json.loads(request.raw_post_data)
 
-	print "google id: %s" % j['google_id']
 	device.google_id = j['google_id']
 	device.save()
-	resp = rc.ALL_OK
-	return resp
+	return rc.ALL_OK
 
 # handler to send a c2dm message
 class C2DMSendHandler(AnonymousBaseHandler):
@@ -92,11 +87,6 @@ class C2DMSendHandler(AnonymousBaseHandler):
 	return resp
 
 # Used to get/set device location information
-# (including whether location is tracked or not)
-# TODO create a separate call for updating allow track
-# reasoning: update to location will be frequent, update allow will be infrequent
-# therefore shouldn't clump their logic together
-# also...we are NEVER calling them together from the android app
 class DeviceLocationHandler(AnonymousBaseHandler):
     allowed_methods = ('GET','PUT')
     model = Device
@@ -108,7 +98,38 @@ class DeviceLocationHandler(AnonymousBaseHandler):
 	    return rc.NOT_FOUND
 
 	return {'id':device.id, 'latitude':device.latitude, 'longitude':device.longitude,
-		'allow_tracking':device.allow_tracking}
+		'loc_timestamp':device.loc_timestamp }
+
+    def update(self, request, device_id):
+	try:
+	    device = Device.objects.get(pk=device_id)
+	except Device.DoesNotExist:
+	    return rc.NOT_FOUND
+
+	j = json.loads(request.raw_post_data)
+
+	# update location if all necessary pieces included
+	if 'latitude' in j and 'longitude' in j and 'loc_timestamp' in j:
+	    device.latitude = j['latitude']
+	    device.longitude = j['longitude']
+	    device.loc_timestamp = j['loc_timestamp']
+	    device.save()
+	    return rc.ALL_OK
+	else:
+	    return rc.BAD_REQUEST
+
+# API for allowing a device to be tracked
+class DeviceAllowTrackHandler(AnonymousBaseHandler):
+    allowed_methods = ('GET','PUT')
+    model = Device
+
+    def read(self, request, device_id):
+	try:
+	    device = Device.objects.get(pk=device_id)
+	except Device.DoesNotExist:
+	    return rc.NOT_FOUND
+
+	return {'id':device.id,	'allow_tracking':device.allow_tracking}
 
     def update(self, request, device_id):
 	try:
@@ -123,27 +144,17 @@ class DeviceLocationHandler(AnonymousBaseHandler):
 	    tracking = string_to_bool(j['allow_tracking'])
 	    device.allow_tracking = tracking
 
-	    # erase stored tracking information
-	    device.latitude = 0.0
-	    device.longitude = 0.0
-	    device.loc_timestamp = 0
+	    # erase stored tracking information if disabiling tracking
+	    if not tracking:
+		device.latitude = 0.0
+		device.longitude = 0.0
+		device.loc_timestamp = 0
 
-	# update latitude if included
-	if 'latitude' in j:
-	    device.latitude = j['latitude']
-
-	# update longitude if included
-	if 'longitude' in j:
-	    device.longitude = j['longitude']
-
-	# update the timestamp for the location
-	if 'loc_timestamp' in j:
-	    device.loc_timestamp = j['loc_timestamp']
-
-	# save the update
-	device.save()
-	resp = rc.ALL_OK
-	return resp
+	    device.save()
+	    return rc.ALL_OK
+	else:
+	    # if not included, return an error
+	    return rc.BAD_REQUEST
 
 class DeviceWipeHandler(AnonymousBaseHandler):
     allowed_methods = ('GET', 'PUT')
@@ -175,8 +186,7 @@ class DeviceWipeHandler(AnonymousBaseHandler):
 	    device.is_wiped = string_to_bool(j['is_wiped'])
 
 	device.save()
-	resp = rc.ALL_OK
-	return resp
+	return rc.ALL_OK
 
 # Location update frequency in seconds
 class LocFrequencyHandler(AnonymousBaseHandler):
@@ -192,15 +202,12 @@ class LocFrequencyHandler(AnonymousBaseHandler):
 	return {'id':device.id, 'track_frequency':device.track_frequency}
 
     def update(self, request, device_id):
-	print "here"
 	try:
 	    device = Device.objects.get(pk=device_id)
 	except Device.DoesNotExist:
 	    return rc.NOT_FOUND
 
 	j = json.loads(request.raw_post_data)
-	print "got json"
-	print j['track_frequency']
 
 	if 'track_frequency' in j:
 	    device.track_frequency = j['track_frequency']
