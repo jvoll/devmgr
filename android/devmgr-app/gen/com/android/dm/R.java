@@ -37,26 +37,30 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f040001;
+        public static final int btNo=0x7f04000d;
         /**   Buttons 
          */
         public static final int btRegister=0x7f04000b;
+        public static final int btYes=0x7f04000c;
         /**  Check Boxes 
          */
-        public static final int cbAllowTrack=0x7f04000c;
+        public static final int cbAllowTrack=0x7f04000e;
         /**  Defaults 
          */
-        public static final int dfLatLong=0x7f040011;
+        public static final int dfLatLong=0x7f040015;
+        public static final int emAllowTrackingFailed=0x7f040012;
         /**  Error Messages 
          */
-        public static final int emRegisterFailed=0x7f04000f;
+        public static final int emRegisterFailed=0x7f040011;
         public static final int hello=0x7f040000;
+        public static final int mgAllowTracking=0x7f040014;
         /**  Messages 
          */
-        public static final int mgEnterName=0x7f040010;
-        public static final int smDeviceNormal=0x7f04000e;
+        public static final int mgEnterName=0x7f040013;
+        public static final int smDeviceNormal=0x7f040010;
         /**  Status Messages 
          */
-        public static final int smDeviceWiped=0x7f04000d;
+        public static final int smDeviceWiped=0x7f04000f;
         public static final int tvCurrentLocation=0x7f040003;
         public static final int tvLatitude=0x7f040004;
         public static final int tvLongitude=0x7f040005;

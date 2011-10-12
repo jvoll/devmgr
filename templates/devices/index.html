@@ -3,13 +3,23 @@
     <ul>
     {% for device in device_list %}
 	<li>
-	    <form action="/devices/{{ device.id }}/wipe/" method="post">
-	    {% csrf_token %}
 	    <h3>{{ device.name }}</h3>
 	    <b>Location Information</b>
 	    {% if device.allow_tracking %}
 		<br>Latitude: {{ device.latitude }}
 		<br>Longitude: {{ device.longitude }}
+		<br>Timestamp: {{ device.getFormattedTimestamp }}
+		<form action="/devices/{{ device.id }}/trackfrequency" method="post">
+		{% csrf_token %}
+		{{ form.non_field_errors }}
+		<div class="fieldWrapper">
+		    {{ location_form.track_frequency.errors }}
+		    Current frequency of location checks: {{ device.track_frequency }} seconds
+		    <br><label for="id_track_frequency">New frequency of location checks:</label>
+		    {{ location_form.track_frequency }}
+		</div>
+		<input type="submit" value="Update frequency" />
+		</form>
 	    {% else %}
 		Tracking is not enabled for this device.
 	    {% endif %}
@@ -32,10 +42,13 @@
 		<br>No
 	    {% endif %}
 	    <br>
+	    <form action="/devices/{{ device.id }}/wipe/" method="post">
+	    {% csrf_token %}
 	    <input type="submit" value="Wipe device" /> 
 	    </form>
 	    <form action= "/devices/{{ device.id }}/send/" method="post">
 	    <input type="submit" value="Send Push Notification" />
+	    </form>
 	</li>
     {% endfor %}
     </ul>

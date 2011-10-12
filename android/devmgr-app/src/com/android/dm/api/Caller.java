@@ -23,6 +23,7 @@ import com.android.dm.Utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.util.Log;
 
 public class Caller {
@@ -38,20 +39,13 @@ public class Caller {
 	private static final String REGISTER_C2DM_ID_API ="devices/c2dm/%id/register";
 	private static final String LOCATION_API = "devices/%id/location";
 	private static final String WIPE_API = "devices/%id/wipestatus";
+	private static final String LOCATION_FREQUENCY_API = "devices/%id/trackfrequency";
 	
-	// Singleton class
-	private static Caller instance = null;
+	// Disable ability to instantiate this class
 	private Caller() {}
-	
-	public static Caller getIntance() {
-		if (instance == null) {
-			instance = new Caller();
-		}
-		return instance;
-	}
-	
+
 	// Register a device using an Http Create request
-	public boolean registerDevice(Context context, String deviceName, boolean allowTracking) {
+	public static boolean registerDevice(Context context, String deviceName, boolean allowTracking) {
 		
 		// Prepare the request
 		String jsonString = "{\"name\":\"" + deviceName + "\", \"allow_tracking\":\"" + allowTracking + "\"}";
@@ -81,7 +75,7 @@ public class Caller {
 	}
 	
 	// Send google c2dm id with server
-	public boolean updateC2DMId(Context context, String id) {
+	public static boolean updateC2DMId(Context context, String id) {
 		
 		// Prepare the request
 		String jsonString = "{\"google_id\":\"" + id + "\"}";
@@ -101,10 +95,10 @@ public class Caller {
 	}
 	
 	// Send the current location of a device
-	public boolean updateLocation(Context context, double latitude, double longitude) {
+	public static boolean updateLocation(Context context, Location location) {
 		
 		// Prepare the request
-		String jsonString = "{\"latitude\":" + latitude + ", \"longitude\":" + longitude + "}";
+		String jsonString = "{\"latitude\":" + location.getLatitude() + ", \"longitude\":" + location.getLongitude() + ", \"loc_timestamp\":" + location.getTime() + "}";
 		HttpPut httpPut = new HttpPut(API_URL + LOCATION_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
@@ -121,7 +115,7 @@ public class Caller {
 	}
 	
 	// Update whether a device is allowed to be tracked
-	public boolean updateAllowTrack(Context context, boolean allowTrack) {
+	public static boolean updateAllowTrack(Context context, boolean allowTrack) {
 		
 		// Prepare the request
 		String jsonString = "{\"allow_tracking\":\"" + allowTrack + "\"}";
@@ -141,7 +135,7 @@ public class Caller {
 	}
 	
 	// Check if the device is to be wiped (returns true if wipe requested)
-	public boolean checkWipeRequest(Context context) {
+	public static boolean checkWipeRequest(Context context) {
 		
 		// Prepare the request
 		HttpGet httpGet = new HttpGet(API_URL + WIPE_API.replace("%id", getDeviceID(context)));
@@ -166,8 +160,57 @@ public class Caller {
 		return false;
 	}
 	
+	// Check the requested location update frequency
+	public static int getLocationUpdateFrequency(Context context) {
+		
+		// Prepare the request
+		HttpGet httpGet = new HttpGet(API_URL + LOCATION_FREQUENCY_API.replace("%id", getDeviceID(context)));
+		
+		// Make the call
+		HttpResponse response = makeHttpCall(httpGet);
+		
+		// Check response
+		if (checkResponse(HttpStatus.SC_OK, response)) {
+			JSONObject json = extractJSON(response);
+			try {
+				String id = json.getString("id");
+				if (!id.equalsIgnoreCase(getDeviceID(context))) {
+					Log.e(ERROR_TAG, "Returned id of wipe request doesn't match this device's id");
+					return 0;
+				}
+				return json.getInt("track_frequency");
+			} catch (JSONException e) {
+				Log.e(ERROR_TAG, e.getMessage());
+			}
+		}
+		return 0;
+		
+	}
+	
+	// Update the requested location update frequency
+	public static boolean updateLocationUpdateFrequency(Context context, int frequency) {
+		
+		// Prepare the request
+		String jsonString = "{\"track_frequency\":\"" + frequency + "\"}";
+		HttpPut httpPut = new HttpPut(API_URL + LOCATION_FREQUENCY_API.replace("%id", getDeviceID(context)));
+		httpPut.addHeader("Content-Type", "application/json");
+		try {
+			httpPut.setEntity(new StringEntity(jsonString));
+		} catch (UnsupportedEncodingException e) {
+			Log.e(ERROR_TAG, e.getMessage());
+		}
+		
+		// Make the call
+		HttpResponse response = makeHttpCall(httpPut);
+		
+		// Check response
+		return checkResponse(HttpStatus.SC_OK, response);
+	}
+	
+	//////////////////// HELPERS /////////////////////////////
+	
 	// Helper for making a HttpCall
-	private HttpResponse makeHttpCall(HttpUriRequest request) {
+	private static HttpResponse makeHttpCall(HttpUriRequest request) {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpResponse response = null;
 		
@@ -181,10 +224,8 @@ public class Caller {
 		return response;
 	}
 	
-	//////////////////// HELPERS /////////////////////////////
-	
 	// Helper function to extract a JSON object from a response
-	private JSONObject extractJSON(HttpResponse response) {
+	private static JSONObject extractJSON(HttpResponse response) {
 		JSONObject json = null;
 		try {
 			String content = convertStreamToString(response.getEntity().getContent());
@@ -200,23 +241,23 @@ public class Caller {
 	}
 	
 	// Helper function to convert an InputStream to a String
-	private String convertStreamToString(InputStream is) { 
+	private static String convertStreamToString(InputStream is) { 
 	    return new Scanner(is).useDelimiter("\\A").next();
 	}
 	
 	// Helper function to get this device's id
-	private String getDeviceID(Context context) {
+	private static String getDeviceID(Context context) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.KEY_PREFS_FILE, Context.MODE_PRIVATE);
 		return prefs.getString(Constants.KEY_DEVICE_ID, "-1");
 	}
 	
 	// Helper to check for successful response code
-	private boolean checkResponse(int expectedResponseCode, HttpResponse response) {
+	private static boolean checkResponse(int expectedResponseCode, HttpResponse response) {
 		if (response == null) {
-			Log.e(ERROR_TAG, "Connection to API failed on device register");
+			Log.e(ERROR_TAG, "Connection to API failed");
 			return false;
 		} else if (response.getStatusLine().getStatusCode() != expectedResponseCode) {
-			Log.e(ERROR_TAG, "Failure registering device");
+			Log.e(ERROR_TAG, "Got http status code: " + response.getStatusLine().getStatusCode());
 			return false;
 		}
 		return true;

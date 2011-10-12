@@ -31,7 +31,8 @@ class DeviceHandler(AnonymousBaseHandler):
 	tracking = string_to_bool(j['allow_tracking'])
 
 	new_device = Device(name=j['name'], latitude=0.0, longitude=0.0,
-			    allow_tracking=tracking, is_wiped=False, wipe_requested=False)
+			    allow_tracking=tracking, is_wiped=False,
+			    wipe_requested=False, track_frequency=3600)
 
 	new_device.save()
 	resp=rc.CREATED
@@ -110,23 +111,22 @@ class DeviceLocationHandler(AnonymousBaseHandler):
 		'allow_tracking':device.allow_tracking}
 
     def update(self, request, device_id):
-	print "testing location api"
 	try:
 	    device = Device.objects.get(pk=device_id)
 	except Device.DoesNotExist:
 	    return rc.NOT_FOUND
 
-	print "found device"
 	j = json.loads(request.raw_post_data)
-
-	print "got request data"
 
 	# update allow_tracking if included
 	if 'allow_tracking' in j:
-	    print "setting allow track"
 	    tracking = string_to_bool(j['allow_tracking'])
 	    device.allow_tracking = tracking
-	    print "set complete"
+
+	    # erase stored tracking information
+	    device.latitude = 0.0
+	    device.longitude = 0.0
+	    device.loc_timestamp = 0
 
 	# update latitude if included
 	if 'latitude' in j:
@@ -136,8 +136,11 @@ class DeviceLocationHandler(AnonymousBaseHandler):
 	if 'longitude' in j:
 	    device.longitude = j['longitude']
 
-	print "saving"
+	# update the timestamp for the location
+	if 'loc_timestamp' in j:
+	    device.loc_timestamp = j['loc_timestamp']
 
+	# save the update
 	device.save()
 	resp = rc.ALL_OK
 	return resp
@@ -173,6 +176,39 @@ class DeviceWipeHandler(AnonymousBaseHandler):
 
 	device.save()
 	resp = rc.ALL_OK
+	return resp
+
+# Location update frequency in seconds
+class LocFrequencyHandler(AnonymousBaseHandler):
+    allowed_methods = ('GET', 'PUT')
+    model = Device
+
+    def read(self, requence, device_id):
+	try:
+	    device = Device.objects.get(pk=device_id)
+	except Device.DoesNotExist:
+	    return rc.NOT_FOUND
+
+	return {'id':device.id, 'track_frequency':device.track_frequency}
+
+    def update(self, request, device_id):
+	print "here"
+	try:
+	    device = Device.objects.get(pk=device_id)
+	except Device.DoesNotExist:
+	    return rc.NOT_FOUND
+
+	j = json.loads(request.raw_post_data)
+	print "got json"
+	print j['track_frequency']
+
+	if 'track_frequency' in j:
+	    device.track_frequency = j['track_frequency']
+	    device.save()
+	    resp = rc.ALL_OK
+	else:
+	    resp = rc.BAD_REQUEST
+
 	return resp
 
 # helper

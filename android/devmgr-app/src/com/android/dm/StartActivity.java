@@ -1,13 +1,11 @@
 package com.android.dm;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -20,16 +18,11 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.android.dm.api.Caller;
-import com.android.dm.c2dm.C2DMessaging;
 
 public class StartActivity extends Activity {
 	
 	ViewSwitcher vsRegister;
-	
-	
-	// Temporary Debug stuff
-	boolean reg = true;
-	public Button btRegister;
+	CheckBox cbAllowTrack;
 	
     /** Called when the activity is first created. */
     @Override
@@ -37,68 +30,34 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_activity);
         
-        // Configure location tracking
-        // Acquire a reference to the system Location Manager
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        // Define a listener that responds to location updates
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-            	// Called when a new location is found by the network location provider.
-            	updateLocation(location);
-            }
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-            public void onProviderEnabled(String provider) {}
-            public void onProviderDisabled(String provider) {}
-          };
-
-        // Register the listener with the Location Manager to receive location updates
-        // TODO optimize location gathering as specified on 
-        // http://developer.android.com/guide/topics/location/obtaining-user-location.html
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-        
         // Register button handler
-        btRegister = (Button) findViewById(R.id.btRegister);
+        Button btRegister = (Button) findViewById(R.id.btRegister);
         btRegister.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				registerDevice(v);
 			}
 		});
         
-        // Tracking checkbox handler
-        CheckBox cbAllowTrack = (CheckBox) findViewById(R.id.cbAllowTrack);
-        cbAllowTrack.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				trackingCheckChange(buttonView, isChecked);
-			}
-		});
-        
-        vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
-        // TODO disable check box until device registered and change instructions label accordingly
         // Switch the view if this device is already registered
         vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
-        SharedPreferences prefs = getSharedPreferences(Constants.KEY_PREFS_FILE, Context.MODE_PRIVATE);
-        if (prefs.contains(Constants.KEY_DEVICE_NAME)) {
-        	Log.i("prefs", "device already registered as: " + prefs.getString(Constants.KEY_DEVICE_NAME, "none"));
+        vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
+        cbAllowTrack = (CheckBox) findViewById(R.id.cbAllowTrack);
+        if (!Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME).equalsIgnoreCase("")) {
         	View button = vsRegister.getCurrentView().findViewById(R.id.btRegister);
         	if (button != null) {
         		vsRegister.showNext();
         	}
         	TextView tvNameValue = (TextView) findViewById(R.id.tvNameValue);
-			tvNameValue.setText(prefs.getString(Constants.KEY_DEVICE_NAME, getString(R.id.tvNameValue)));
+			tvNameValue.setText(Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME));
+	        cbAllowTrack.setChecked(Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK));
         }
-    }
-    
-    // Handler for a location change event
-    private void updateLocation(Location location) {
-    	Double latitude = location.getLatitude();
-    	Double longitude = location.getLongitude();
-    	TextView tvLatitude = (TextView) findViewById(R.id.tvLatitudeValue);
-    	TextView tvLongitude = (TextView) findViewById(R.id.tvLongitudeValue);
-    	tvLatitude.setText(Double.toString(latitude));
-    	tvLongitude.setText(Double.toString(longitude));
-    	Caller.getIntance().updateLocation(this, latitude, longitude);
+        
+        // Tracking checkbox handler
+        cbAllowTrack.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				trackingCheckChange(buttonView, isChecked);
+			}
+		});
     }
     
     // Handler for the Register button
@@ -116,7 +75,7 @@ public class StartActivity extends Activity {
     	CheckBox cbAllowTrack = (CheckBox) findViewById(R.id.cbAllowTrack);
     	
     	// Call the api to register the device
-		if ( Caller.getIntance().registerDevice(this, name.trim(), cbAllowTrack.isChecked()) ) {
+		if ( Caller.registerDevice(this, name.trim(), cbAllowTrack.isChecked()) ) {
 			
 			// Switch the view
 			vsRegister.showNext();
@@ -124,7 +83,7 @@ public class StartActivity extends Activity {
 			tvNameValue.setText(name);
 			
 			// Register with google for c2dm
-			C2DMessaging.register(this);
+			// C2DMessaging.register(this);
 			
 		} else {
 			Toast.makeText(StartActivity.this, getString(R.string.emRegisterFailed),
@@ -135,8 +94,50 @@ public class StartActivity extends Activity {
     // Handler for the Allow tracking checkbox
     private void trackingCheckChange(CompoundButton buttonView, boolean isChecked) {
     	
-    	if ( Caller.getIntance().updateAllowTrack(this, isChecked) ) {
-    		Utilities.editSharedPref(this, Constants.KEY_ALLOW_TRACK, isChecked);
+    	// Update preferences on the server
+        if (!Caller.updateAllowTrack(this, isChecked)) {
+        	Toast.makeText(this, getString(R.string.emAllowTrackingFailed), Toast.LENGTH_LONG).show();
+        	cbAllowTrack.setChecked(!isChecked);
+        	return;
+        }
+        
+        // Save locally to persistent storage
+		final Intent intent = new Intent();
+		intent.setAction(Constants.LOCATION_SERVICE_INTENT);
+        intent.setClassName(this, LocationUpdateService.class.getName());
+		Utilities.editSharedPref(this, Constants.KEY_ALLOW_TRACK, isChecked);
+        
+		// Display a nag message to make sure users know their location will be
+		// sent to and stored on Mozilla servers
+		if (isChecked) {
+			
+	    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	    	builder.setMessage(getString(R.string.mgAllowTracking))
+	    	       .setPositiveButton(getString(R.string.btYes), new DialogInterface.OnClickListener() {
+	    	           public void onClick(DialogInterface dialog, int id) {
+	    	               // Handle Yes 
+	    	        	   startService(intent);
+	    	           }
+	    	       })
+	    	       .setNegativeButton(getString(R.string.btNo), new DialogInterface.OnClickListener() {
+	    	           public void onClick(DialogInterface dialog, int id) {
+	    	               // Handle No - uncheck the box and make sure no updates are happening 
+	    	        	   cbAllowTrack.setChecked(false);
+	    	        	   cancelLocationUpdates(intent);
+	    	           }
+	    	       })
+	    	       .show();
+		} else {
+    		cancelLocationUpdates(intent);
     	}
+    }
+    
+    private void cancelLocationUpdates(Intent intent) {
+		// Cancel any alarms that would restart the service
+		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		alarmManager.cancel(LocationUpdateService.getAlarmManagerLocationServicePI(this));
+		
+		// Stop the service if it is running
+		stopService(intent);
     }
 }

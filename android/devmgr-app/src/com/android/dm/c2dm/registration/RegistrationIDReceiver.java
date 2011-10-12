@@ -51,7 +51,7 @@ public class RegistrationIDReceiver extends IntentService {
         C2DMessaging.setRegistrationId(this, registrationId);
         
         // TODO check if call to server worked, try again later if failed
-        Caller.getIntance().updateC2DMId(this, registrationId);
+        Caller.updateC2DMId(this, registrationId);
     }
 
     private void handleRegistrationError(String error, Intent intent) {

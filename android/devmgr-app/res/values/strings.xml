@@ -16,6 +16,8 @@
     
     <!--  Buttons -->
     <string name="btRegister">Register</string>
+    <string name="btYes">Yes</string>
+    <string name="btNo">No</string>
     
     <!-- Check Boxes -->
     <string name="cbAllowTrack">Allow tracking of this device</string>
@@ -26,9 +28,11 @@
     
     <!-- Error Messages -->
     <string name="emRegisterFailed">Registering device failed. Please make sure you are connected to the Internet or try again later.</string>
+    <string name="emAllowTrackingFailed">Failed to contact the server. Please make sure you are connected to the Internet or try again later.</string>
     
     <!-- Messages -->
     <string name="mgEnterName">Enter a device name before registering your device.</string>
+    <string name="mgAllowTracking">If you decide allow tracking of this device, it will occasionally check-in with Mozilla servers which will store your device\'s most recent known location. This will be done in a secure manner and Mozilla will only store your device\'s most recent location. For more information see [device manager website here]. \n\nIs Mozilla storing this information okay with you?</string>
     
     <!-- Defaults -->
     <string name="dfLatLong">0.0000</string>

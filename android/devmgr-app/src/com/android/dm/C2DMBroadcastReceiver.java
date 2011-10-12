@@ -28,6 +28,9 @@ public class C2DMBroadcastReceiver extends BroadcastReceiver {
             Log.d(Constants.TAG, "Received a C2DM message from Google.");
             handleMessage(context, intent);
         }
+        else {
+        	Log.w(Constants.TAG, "Got unhandled intent with action: " + intent.getAction());
+        }
     }
     
     private void handleMessage(Context context, Intent intent) {
