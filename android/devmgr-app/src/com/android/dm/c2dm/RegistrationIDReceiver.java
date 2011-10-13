@@ -1,4 +1,4 @@
-package com.android.dm.c2dm.registration;
+package com.android.dm.c2dm;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.android.dm.Constants;
 import com.android.dm.api.Caller;
-import com.android.dm.c2dm.C2DMessaging;
 
 public class RegistrationIDReceiver extends IntentService {
 	// TODO various locking stuff for power consumption and other purposes:

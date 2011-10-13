@@ -117,6 +117,16 @@
 	            android:text="@string/dfLatLong">
 	        </TextView>
         </TableRow>
+        <TableRow>
+            <TextView
+                android:text="@string/tvLocTime">
+            </TextView>
+            <TextView
+                android:id="@+id/tvLocTimeValue"
+                android:gravity="right"
+                android:text="@string/dfLocTime">
+            </TextView>
+        </TableRow>
     </TableLayout>
     <TableLayout
         android:id="@+id/tl2"

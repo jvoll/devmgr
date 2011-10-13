@@ -2,11 +2,8 @@ package com.android.dm;
 
 import java.util.Calendar;
 
-import com.android.dm.api.Caller;
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -21,7 +18,10 @@ import android.os.Message;
 import android.os.Process;
 import android.widget.Toast;
 
-public class LocationUpdateService extends Service {
+import com.android.dm.api.Caller;
+import com.android.dm.tools.DMService;
+
+public class LocationUpdateService extends DMService {
 	private Looper mServiceLooper;
 	private ServiceHandler mServiceHandler;
 	private LocationManager mLocationManager;
@@ -119,6 +119,7 @@ public class LocationUpdateService extends Service {
 		// than an older one, etc.
 		Utilities.saveLocation(this, location);
 		Caller.updateLocation(this, location);
+		getAppContext().notifyLocationChanged();
 	}
 
 	private void setAlarm() {

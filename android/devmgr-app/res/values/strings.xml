@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, StartActivity!</string>
-    <string name="app_name">Device manager</string>
+    <string name="app_name">Mozilla Device Manager</string>
     
     <!-- Control Labels -->
     <string name="tvWipeStatus">Wipe status: </string>
-    <string name="tvCurrentLocation">Current location</string>
+    <string name="tvCurrentLocation">Last location sent to server</string>
     <string name="tvLatitude">Latitude: </string>
     <string name="tvLongitude">Longitude: </string>
+    <string name="tvLocTime">Time location obtained: </string>
     <string name="tvRegister">This device is not registered with the Mozilla device manager.Enter a device name and click Register to setup Device Manager.</string>
     <string name="tvRegistered">This device is registered with the Mozilla device manager. You can now (optionally) track your device or perform a remote wipe.</string>
     <string name="tvNameRegister">Device name: </string>
@@ -36,4 +36,5 @@
     
     <!-- Defaults -->
     <string name="dfLatLong">0.0000</string>
+    <string name="dfLocTime">Never</string>
 </resources>

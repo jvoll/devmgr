@@ -1,4 +1,4 @@
-package com.android.dm;
+package com.android.dm.c2dm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.dm.c2dm.registration.RegistrationIDReceiver;
+import com.android.dm.Constants;
 
 /**
  * Receives messages sent from the C2DM service and passes them to an Android

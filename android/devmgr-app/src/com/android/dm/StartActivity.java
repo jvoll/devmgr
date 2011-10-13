@@ -1,11 +1,13 @@
 package com.android.dm;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -18,11 +20,19 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.android.dm.api.Caller;
+import com.android.dm.tools.DMActivity;
+import com.android.dm.tools.MessageHandler;
 
-public class StartActivity extends Activity {
+public class StartActivity extends DMActivity implements MessageHandler {
 	
+	Handler messageHandler;
+	
+	// UI Components
 	ViewSwitcher vsRegister;
 	CheckBox cbAllowTrack;
+	TextView tvLatitude;
+	TextView tvLongitude;
+	TextView tvLocTime;
 	
     /** Called when the activity is first created. */
     @Override
@@ -30,6 +40,19 @@ public class StartActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_activity);
         
+        // Create a message handler for processing messages from
+        // any services (ex. location update service)
+		messageHandler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+			switch(msg.what){
+			     case Constants.MESSAGE_LOCATION_UPDATE:
+		    	 	updateGUILocation();
+		            break;
+			   }
+			}
+		};
+		
         // Register button handler
         Button btRegister = (Button) findViewById(R.id.btRegister);
         btRegister.setOnClickListener(new OnClickListener() {
@@ -38,20 +61,46 @@ public class StartActivity extends Activity {
 			}
 		});
         
-        // Switch the view if this device is already registered
-        vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
+        // Initialize UI components
         vsRegister = (ViewSwitcher) findViewById(R.id.vsRegisterDevice);
         cbAllowTrack = (CheckBox) findViewById(R.id.cbAllowTrack);
-        cbAllowTrack.setEnabled(false);
+        tvLatitude = (TextView) findViewById(R.id.tvLatitudeValue);
+        tvLongitude = (TextView) findViewById(R.id.tvLongitudeValue);
+        tvLocTime = (TextView) findViewById(R.id.tvLocTimeValue);
+        
+        // Switch the view if this device is already registered
         if (!Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME).equalsIgnoreCase("")) {
         	View button = vsRegister.getCurrentView().findViewById(R.id.btRegister);
         	if (button != null) {
         		vsRegister.showNext();
         	}
+        	
+        	// Display device name
         	TextView tvNameValue = (TextView) findViewById(R.id.tvNameValue);
 			tvNameValue.setText(Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME));
+			
+			// Enable allow tracking and set it appropriately
 			cbAllowTrack.setEnabled(true);
-	        cbAllowTrack.setChecked(Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK));
+			boolean allowTrack = Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK);
+			cbAllowTrack.setChecked(allowTrack);
+	        
+	        // Set the last reported location
+	        updateGUILocation();
+	        
+	        // Setup tracking if it is enabled
+	        if (allowTrack) {
+		        // Subscribe to messages from the service
+		        getAppContext().subscribeMessages(this);
+		        
+		        // Restart the service in case it isn't running,
+		        // even if it is, we'd like to get a new location since user
+		        // is using the app and we want to show them responsiveness.
+		        stopServiceAndAlarm();
+		        startService();
+	        }
+	        
+        } else {
+	        cbAllowTrack.setEnabled(false);
         }
         
         // Tracking checkbox handler
@@ -61,6 +110,8 @@ public class StartActivity extends Activity {
 			}
 		});
     }
+    
+    ////////////////////////////// HANDLERS ////////////////////////////////////
     
     // Handler for the Register button
     private void registerDevice(View v) {
@@ -102,9 +153,6 @@ public class StartActivity extends Activity {
         }
         
         // Save locally to persistent storage
-		final Intent intent = new Intent();
-		intent.setAction(Constants.LOCATION_SERVICE_INTENT);
-        intent.setClassName(this, LocationUpdateService.class.getName());
 		Utilities.editSharedPref(this, Constants.KEY_ALLOW_TRACK, isChecked);
         
 		// Display a nag message to make sure users know their location will be
@@ -116,28 +164,72 @@ public class StartActivity extends Activity {
 	    	       .setPositiveButton(getString(R.string.btYes), new DialogInterface.OnClickListener() {
 	    	           public void onClick(DialogInterface dialog, int id) {
 	    	               // Handle Yes 
-	    	        	   startService(intent);
+	    	        	   startService();
+	    	        	   getAppContext().subscribeMessages(StartActivity.this);
 	    	           }
 	    	       })
 	    	       .setNegativeButton(getString(R.string.btNo), new DialogInterface.OnClickListener() {
 	    	           public void onClick(DialogInterface dialog, int id) {
 	    	               // Handle No - uncheck the box and make sure no updates are happening 
 	    	        	   cbAllowTrack.setChecked(false);
-	    	        	   cancelLocationUpdates(intent);
+	    	        	   cancelLocationUpdates();
 	    	           }
 	    	       })
 	    	       .show();
 		} else {
-    		cancelLocationUpdates(intent);
+    		cancelLocationUpdates();
     	}
     }
+
+	public Handler getHandler() {
+		return messageHandler;
+	}
     
-    private void cancelLocationUpdates(Intent intent) {
-		// Cancel any alarms that would restart the service
+    //////////////////////////////// HELPERS ////////////////////////////////////
+    
+    private void cancelLocationUpdates() {
+		
+		// Stop service and any alarms which will start it
+    	stopServiceAndAlarm();
+		
+		// Reset location to defaults
+		Utilities.saveLocation(this, null);
+		updateGUILocation();
+		
+		// Remove this as a listener
+		getAppContext().unsubscribeMessages(this);
+		
+    }
+    
+    private Intent getLocationServiceIntent() {
+		final Intent intent = new Intent();
+		intent.setAction(Constants.LOCATION_SERVICE_INTENT);
+        intent.setClassName(this, LocationUpdateService.class.getName());
+        return intent;
+    }
+    
+    private void startService() {
+	   startService(getLocationServiceIntent());
+    }
+    
+    private void stopServiceAndAlarm() {
+		// Cancel any alarm that would restart the service
 		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 		alarmManager.cancel(LocationUpdateService.getAlarmManagerLocationServicePI(this));
 		
 		// Stop the service if it is running
-		stopService(intent);
+		stopService(getLocationServiceIntent());
     }
+
+	private void updateGUILocation() {
+		Location location = Utilities.getLocation(this);
+		tvLatitude.setText(Double.toString(location.getLatitude()));
+		tvLongitude.setText(Double.toString(location.getLongitude()));
+		if (location.getTime() == 0) {
+			tvLocTime.setText(getString(R.string.dfLocTime));
+		} else {
+			String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date (location.getTime()));
+			tvLocTime.setText(date);
+		}
+	}
 }

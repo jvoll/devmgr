@@ -18,25 +18,25 @@ public final class R {
         public static final int cbAllowTrack=0x7f050008;
         public static final int etName=0x7f050004;
         public static final int tl1=0x7f050009;
-        public static final int tl2=0x7f05000d;
+        public static final int tl2=0x7f05000e;
         public static final int tvCurrentLocation=0x7f05000a;
         public static final int tvLatitudeValue=0x7f05000b;
+        public static final int tvLocTimeValue=0x7f05000d;
         public static final int tvLongitudeValue=0x7f05000c;
         public static final int tvNameRegister=0x7f050002;
         public static final int tvNameRegistered=0x7f050006;
         public static final int tvNameValue=0x7f050007;
         public static final int tvRegister=0x7f050001;
         public static final int tvRegistered=0x7f050005;
-        public static final int tvWipeStatus=0x7f05000e;
-        public static final int tvWipeStatusValue=0x7f05000f;
+        public static final int tvWipeStatus=0x7f05000f;
+        public static final int tvWipeStatusValue=0x7f050010;
         public static final int vsRegisterDevice=0x7f050000;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
-        public static final int start_activity=0x7f030001;
+        public static final int start_activity=0x7f030000;
     }
     public static final class string {
-        public static final int app_name=0x7f040001;
+        public static final int app_name=0x7f040000;
         public static final int btNo=0x7f04000d;
         /**   Buttons 
          */
@@ -48,11 +48,11 @@ public final class R {
         /**  Defaults 
          */
         public static final int dfLatLong=0x7f040015;
+        public static final int dfLocTime=0x7f040016;
         public static final int emAllowTrackingFailed=0x7f040012;
         /**  Error Messages 
          */
         public static final int emRegisterFailed=0x7f040011;
-        public static final int hello=0x7f040000;
         public static final int mgAllowTracking=0x7f040014;
         /**  Messages 
          */
@@ -61,9 +61,10 @@ public final class R {
         /**  Status Messages 
          */
         public static final int smDeviceWiped=0x7f04000f;
-        public static final int tvCurrentLocation=0x7f040003;
-        public static final int tvLatitude=0x7f040004;
-        public static final int tvLongitude=0x7f040005;
+        public static final int tvCurrentLocation=0x7f040002;
+        public static final int tvLatitude=0x7f040003;
+        public static final int tvLocTime=0x7f040005;
+        public static final int tvLongitude=0x7f040004;
         public static final int tvNameRegister=0x7f040008;
         public static final int tvNameRegistered=0x7f040009;
         public static final int tvNameValue=0x7f04000a;
@@ -71,6 +72,6 @@ public final class R {
         public static final int tvRegistered=0x7f040007;
         /**  Control Labels 
          */
-        public static final int tvWipeStatus=0x7f040002;
+        public static final int tvWipeStatus=0x7f040001;
     }
 }

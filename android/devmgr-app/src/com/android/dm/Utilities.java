@@ -42,11 +42,19 @@ public class Utilities {
 	// Save last location to persistent storage
 	public static void saveLocation(Context context, Location location) {
 		Editor editor = getEditor(context);
-		editor.putFloat(KEY_LOC_LAT, (float) location.getLatitude());
-		editor.putFloat(KEY_LOC_LONG, (float) location.getLongitude());
-		editor.putString(KEY_LOC_PROVIDER, location.getProvider());
-		editor.putFloat(KEY_LOC_ACCURACY, location.getAccuracy());
-		editor.putLong(KEY_LOC_TIME, location.getTime());
+		if (location != null) {
+			editor.putFloat(KEY_LOC_LAT, (float) location.getLatitude());
+			editor.putFloat(KEY_LOC_LONG, (float) location.getLongitude());
+			editor.putString(KEY_LOC_PROVIDER, location.getProvider());
+			editor.putFloat(KEY_LOC_ACCURACY, location.getAccuracy());
+			editor.putLong(KEY_LOC_TIME, location.getTime());
+		} else {
+			editor.putFloat(KEY_LOC_LAT, 0);
+			editor.putFloat(KEY_LOC_LONG, 0);
+			editor.putString(KEY_LOC_PROVIDER, "None");
+			editor.putFloat(KEY_LOC_ACCURACY, 0);
+			editor.putLong(KEY_LOC_TIME, 0);
+		}
 		editor.commit();		
 	}
 	

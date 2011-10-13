@@ -7,6 +7,9 @@ public interface Constants {
 	public static final String KEY_DEVICE_ID = "com.android.dm.id";
 	public static final String KEY_ALLOW_TRACK = "com.android.dm.track";
 	public static final String KEY_DEVICE_NAME = "com.android.dm.name";
+	
+	// Constants for service to activity messages
+	public static final int MESSAGE_LOCATION_UPDATE = 100;
 
 	// Intent name for location update service
 	public static final String LOCATION_SERVICE_INTENT = "com.android.dm.intent.START_LOCATION_SERVICE";
