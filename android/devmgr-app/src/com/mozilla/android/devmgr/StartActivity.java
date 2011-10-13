@@ -1,4 +1,4 @@
-package com.android.dm;
+package com.mozilla.android.devmgr;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -19,9 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.android.dm.api.Caller;
-import com.android.dm.tools.DMActivity;
-import com.android.dm.tools.MessageHandler;
+import com.mozilla.android.devmgr.api.Caller;
+import com.mozilla.android.devmgr.tools.DMActivity;
+import com.mozilla.android.devmgr.tools.MessageHandler;
+import com.mozilla.android.devmgr.R;
 
 public class StartActivity extends DMActivity implements MessageHandler {
 	

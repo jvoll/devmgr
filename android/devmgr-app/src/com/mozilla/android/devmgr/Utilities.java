@@ -1,4 +1,4 @@
-package com.android.dm;
+package com.mozilla.android.devmgr;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,11 +7,11 @@ import android.location.Location;
 
 public class Utilities {
 	
-	private static final String KEY_LOC_LAT = "com.android.dm.lat";
-	private static final String KEY_LOC_LONG = "com.android.dm.long";
-	private static final String KEY_LOC_PROVIDER = "com.android.dm.loc_provider";
-	private static final String KEY_LOC_ACCURACY = "com.android.dm.loc_accuracy";
-	private static final String KEY_LOC_TIME = "com.android.dm.loc_time";
+	private static final String KEY_LOC_LAT = "com.mozilla.android.devmgr.lat";
+	private static final String KEY_LOC_LONG = "com.mozilla.android.devmgr.long";
+	private static final String KEY_LOC_PROVIDER = "com.mozilla.android.devmgr.loc_provider";
+	private static final String KEY_LOC_ACCURACY = "com.mozilla.android.devmgr.loc_accuracy";
+	private static final String KEY_LOC_TIME = "com.mozilla.android.devmgr.loc_time";
 	
 	// Edit a shared preference (a persistent storage mechanism)
 	public static void editSharedPref(Context context, String key, String value) {

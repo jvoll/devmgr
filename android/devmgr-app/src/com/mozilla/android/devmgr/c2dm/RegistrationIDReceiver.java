@@ -1,4 +1,4 @@
-package com.android.dm.c2dm;
+package com.mozilla.android.devmgr.c2dm;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.android.dm.Constants;
-import com.android.dm.api.Caller;
+import com.mozilla.android.devmgr.Constants;
+import com.mozilla.android.devmgr.api.Caller;
 
 public class RegistrationIDReceiver extends IntentService {
 	// TODO various locking stuff for power consumption and other purposes:

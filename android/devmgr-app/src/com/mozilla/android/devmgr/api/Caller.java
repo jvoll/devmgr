@@ -1,4 +1,4 @@
-package com.android.dm.api;
+package com.mozilla.android.devmgr.api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +18,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.dm.Constants;
-import com.android.dm.Utilities;
+import com.mozilla.android.devmgr.Constants;
+import com.mozilla.android.devmgr.Utilities;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;

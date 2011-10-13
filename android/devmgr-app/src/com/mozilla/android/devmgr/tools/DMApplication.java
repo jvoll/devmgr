@@ -1,10 +1,10 @@
-package com.android.dm.tools;
+package com.mozilla.android.devmgr.tools;
 
 import java.util.ArrayList;
 
-import android.app.Application;
+import com.mozilla.android.devmgr.Constants;
 
-import com.android.dm.Constants;
+import android.app.Application;
 
 public class DMApplication extends Application {
 	

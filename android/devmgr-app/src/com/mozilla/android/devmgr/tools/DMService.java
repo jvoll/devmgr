@@ -1,4 +1,4 @@
-package com.android.dm.tools;
+package com.mozilla.android.devmgr.tools;
 
 import android.app.Service;
 import android.content.Intent;

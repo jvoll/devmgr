@@ -1,4 +1,4 @@
-package com.android.dm;
+package com.mozilla.android.devmgr;
 
 import java.util.Calendar;
 
@@ -18,8 +18,8 @@ import android.os.Message;
 import android.os.Process;
 import android.widget.Toast;
 
-import com.android.dm.api.Caller;
-import com.android.dm.tools.DMService;
+import com.mozilla.android.devmgr.api.Caller;
+import com.mozilla.android.devmgr.tools.DMService;
 
 public class LocationUpdateService extends DMService {
 	private Looper mServiceLooper;

@@ -1,4 +1,4 @@
-package com.android.dm.tools;
+package com.mozilla.android.devmgr.tools;
 
 import android.os.Handler;
 

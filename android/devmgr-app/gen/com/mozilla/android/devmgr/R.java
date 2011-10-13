@@ -5,7 +5,7 @@
  * should not be modified by hand.
  */
 
-package com.android.dm;
+package com.mozilla.android.devmgr;
 
 public final class R {
     public static final class attr {

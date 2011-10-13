@@ -1,4 +1,4 @@
-package com.android.dm.c2dm;
+package com.mozilla.android.devmgr.c2dm;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.android.dm.Constants;
+import com.mozilla.android.devmgr.Constants;
 
 public class C2DMessaging {
 
