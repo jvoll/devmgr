@@ -1,4 +1,5 @@
-package com.mozilla.android.devmgr;
+package com.mozilla.android.devmgr.tools;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +14,10 @@ public class Utilities {
 	private static final String KEY_LOC_ACCURACY = "com.mozilla.android.devmgr.loc_accuracy";
 	private static final String KEY_LOC_TIME = "com.mozilla.android.devmgr.loc_time";
 	
+	// Defines what is returned when there is no value set of a shared pref
+	public static final String SP_DEFAULT_STRING = "";
+	public static final int SP_DEFAULT_INT = -1;
+	
 	// Edit a shared preference (a persistent storage mechanism)
 	public static void editSharedPref(Context context, String key, String value) {
 		Editor editor = getEditor(context);
@@ -26,17 +31,30 @@ public class Utilities {
 		editor.putBoolean(key, value);
 		editor.commit();
 	}
+	
+	// Edit a shared preference (a persistent storage mechanism)
+	public static void editSharedPref(Context context, String key, int value) {
+		Editor editor = getEditor(context);
+		editor.putInt(key, value);
+		editor.commit();
+	}
 
 	// Get a shared preference (persistent storage)
 	public static String getSharedPrefString(Context context, String key) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.KEY_PREFS_FILE, Context.MODE_PRIVATE);
-		return prefs.getString(key, "");
+		return prefs.getString(key, SP_DEFAULT_STRING);
 	}
 	
 	// Get a shared preference (persistent storage)
 	public static boolean getSharedPrefBool(Context context, String key) {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.KEY_PREFS_FILE, Context.MODE_PRIVATE);
 		return prefs.getBoolean(key, false);
+	}
+	
+	// Get a shared preference (persistent storage)
+	public static int getSharedPrefInt(Context context, String key) {
+		SharedPreferences prefs = context.getSharedPreferences(Constants.KEY_PREFS_FILE, Context.MODE_PRIVATE);
+		return prefs.getInt(key, SP_DEFAULT_INT);
 	}
 
 	// Save last location to persistent storage

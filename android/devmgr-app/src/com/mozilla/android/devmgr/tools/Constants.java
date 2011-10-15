@@ -1,4 +1,4 @@
-package com.mozilla.android.devmgr;
+package com.mozilla.android.devmgr.tools;
 
 public interface Constants {
 
@@ -7,9 +7,14 @@ public interface Constants {
 	public static final String KEY_DEVICE_ID = "com.mozilla.android.devmgr.id";
 	public static final String KEY_ALLOW_TRACK = "com.mozilla.android.devmgr.track";
 	public static final String KEY_DEVICE_NAME = "com.mozilla.android.devmgr.name";
+	public static final String KEY_SERVER_ADDRESS = "com.mozilla.android.devmgr.server_address";
+	public static final String KEY_LOC_UPDATE_FREQUENCY = "com.mozilla.android.devmgr.loc_update_frequency";
 	
 	// Constants for service to activity messages
 	public static final int MESSAGE_LOCATION_UPDATE = 100;
+	
+	// Server URL
+	public static final String DEFAULT_API_URL = "http://10.0.2.2:8000";
 
 	// Intent name for location update service
 	public static final String LOCATION_SERVICE_INTENT = "com.mozilla.android.devmgr.intent.START_LOCATION_SERVICE";

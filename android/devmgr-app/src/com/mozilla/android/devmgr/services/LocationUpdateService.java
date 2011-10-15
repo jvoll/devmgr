@@ -1,4 +1,4 @@
-package com.mozilla.android.devmgr;
+package com.mozilla.android.devmgr.services;
 
 import java.util.Calendar;
 
@@ -19,7 +19,9 @@ import android.os.Process;
 import android.widget.Toast;
 
 import com.mozilla.android.devmgr.api.Caller;
-import com.mozilla.android.devmgr.tools.DMService;
+import com.mozilla.android.devmgr.base.DMService;
+import com.mozilla.android.devmgr.tools.Constants;
+import com.mozilla.android.devmgr.tools.Utilities;
 
 public class LocationUpdateService extends DMService {
 	private Looper mServiceLooper;
@@ -45,7 +47,7 @@ public class LocationUpdateService extends DMService {
 					// location provider.
 					updateLocation(location);
 					
-					setAlarm();
+					LocationUpdateService.setAlarm(LocationUpdateService.this);
 					stopSelf();
 				}
 
@@ -122,23 +124,46 @@ public class LocationUpdateService extends DMService {
 		getAppContext().notifyLocationChanged();
 	}
 
-	private void setAlarm() {
+	// Static methods for controlling the service
+	public static void setAlarm(Context context) {
 
-		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 
 		// Get frequency of location reporting in seconds
 		// TODO used C2DM to make this a push call when this changes
-		int frequency = Caller.getLocationUpdateFrequency(this);
+		int frequency = Caller.getLocationUpdateFrequency(context);
+		Utilities.editSharedPref(context, Constants.KEY_LOC_UPDATE_FREQUENCY, frequency);
 		calendar.add(Calendar.SECOND, frequency);
 		alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-				getAlarmManagerLocationServicePI(this));
+				getAlarmManagerLocationServicePI(context));
 	}
 	
-	public static PendingIntent getAlarmManagerLocationServicePI(Context context) {
-		Intent myIntent = new Intent(context, LocationUpdateService.class);
-		PendingIntent pendingIntent = PendingIntent.getService(context, 0, myIntent, 0);
+	private static PendingIntent getAlarmManagerLocationServicePI(Context context) {
+		PendingIntent pendingIntent = PendingIntent.getService(
+				context, 0, getLocationServiceIntent(context), 0);
 		return pendingIntent;
 	}
+	
+    private static Intent getLocationServiceIntent(Context context) {
+		final Intent intent = new Intent();
+		intent.setAction(Constants.LOCATION_SERVICE_INTENT);
+        intent.setClassName(context, LocationUpdateService.class.getName());
+        return intent;
+    }
+    
+    public static void startService(Context context) {
+	   context.startService(getLocationServiceIntent(context));
+    }
+    
+    public static void stopServiceAndAlarm(Context context) {
+		// Cancel any alarm that would restart the service
+		AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+		alarmManager.cancel(LocationUpdateService.getAlarmManagerLocationServicePI(context));
+		
+		// Stop the service if it is running
+		context.stopService(getLocationServiceIntent(context));
+    }
+	
 }

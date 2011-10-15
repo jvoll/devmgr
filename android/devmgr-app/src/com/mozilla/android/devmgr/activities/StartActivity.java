@@ -1,9 +1,7 @@
-package com.mozilla.android.devmgr;
+package com.mozilla.android.devmgr.activities;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,10 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.mozilla.android.devmgr.api.Caller;
-import com.mozilla.android.devmgr.tools.DMActivity;
-import com.mozilla.android.devmgr.tools.MessageHandler;
 import com.mozilla.android.devmgr.R;
+import com.mozilla.android.devmgr.api.Caller;
+import com.mozilla.android.devmgr.base.DMActivity;
+import com.mozilla.android.devmgr.services.LocationUpdateService;
+import com.mozilla.android.devmgr.tools.Constants;
+import com.mozilla.android.devmgr.tools.MessageHandler;
+import com.mozilla.android.devmgr.tools.Utilities;
 
 public class StartActivity extends DMActivity implements MessageHandler {
 	
@@ -96,8 +97,8 @@ public class StartActivity extends DMActivity implements MessageHandler {
 		        // Restart the service in case it isn't running,
 		        // even if it is, we'd like to get a new location since user
 		        // is using the app and we want to show them responsiveness.
-		        stopServiceAndAlarm();
-		        startService();
+		        LocationUpdateService.stopServiceAndAlarm(this);
+		        LocationUpdateService.startService(this);
 	        }
 	        
         } else {
@@ -165,7 +166,7 @@ public class StartActivity extends DMActivity implements MessageHandler {
 	    	       .setPositiveButton(getString(R.string.btYes), new DialogInterface.OnClickListener() {
 	    	           public void onClick(DialogInterface dialog, int id) {
 	    	               // Handle Yes 
-	    	        	   startService();
+	    	        	   LocationUpdateService.startService(StartActivity.this);
 	    	        	   getAppContext().subscribeMessages(StartActivity.this);
 	    	           }
 	    	       })
@@ -191,7 +192,7 @@ public class StartActivity extends DMActivity implements MessageHandler {
     private void cancelLocationUpdates() {
 		
 		// Stop service and any alarms which will start it
-    	stopServiceAndAlarm();
+    	LocationUpdateService.stopServiceAndAlarm(this);
 		
 		// Reset location to defaults
 		Utilities.saveLocation(this, null);
@@ -202,26 +203,6 @@ public class StartActivity extends DMActivity implements MessageHandler {
 		
     }
     
-    private Intent getLocationServiceIntent() {
-		final Intent intent = new Intent();
-		intent.setAction(Constants.LOCATION_SERVICE_INTENT);
-        intent.setClassName(this, LocationUpdateService.class.getName());
-        return intent;
-    }
-    
-    private void startService() {
-	   startService(getLocationServiceIntent());
-    }
-    
-    private void stopServiceAndAlarm() {
-		// Cancel any alarm that would restart the service
-		AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		alarmManager.cancel(LocationUpdateService.getAlarmManagerLocationServicePI(this));
-		
-		// Stop the service if it is running
-		stopService(getLocationServiceIntent());
-    }
-
 	private void updateGUILocation() {
 		Location location = Utilities.getLocation(this);
 		tvLatitude.setText(Double.toString(location.getLatitude()));

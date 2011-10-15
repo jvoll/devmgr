@@ -1,8 +1,9 @@
-package com.mozilla.android.devmgr.tools;
+package com.mozilla.android.devmgr.base;
 
 import java.util.ArrayList;
 
-import com.mozilla.android.devmgr.Constants;
+import com.mozilla.android.devmgr.tools.Constants;
+import com.mozilla.android.devmgr.tools.MessageHandler;
 
 import android.app.Application;
 

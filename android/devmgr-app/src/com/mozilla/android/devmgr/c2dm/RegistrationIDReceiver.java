@@ -7,8 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.mozilla.android.devmgr.Constants;
 import com.mozilla.android.devmgr.api.Caller;
+import com.mozilla.android.devmgr.tools.Constants;
 
 public class RegistrationIDReceiver extends IntentService {
 	// TODO various locking stuff for power consumption and other purposes:

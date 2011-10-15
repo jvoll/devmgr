@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.mozilla.android.devmgr.Constants;
+import com.mozilla.android.devmgr.tools.Constants;
 
 /**
  * Receives messages sent from the C2DM service and passes them to an Android

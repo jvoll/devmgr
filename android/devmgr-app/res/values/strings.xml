@@ -13,11 +13,16 @@
     <string name="tvNameRegister">Device name: </string>
     <string name="tvNameRegistered">Device name set to: </string>
     <string name="tvNameValue">No name</string>
+    <string name="tvServerAddress">Server Address</string>
+    <string name="tvLocationUpdateFrequency">Location Update Frequency (seconds)</string>
+    <string name="tvTrackingDisabled">You must enable device tracking to change this.</string>
     
     <!--  Buttons -->
     <string name="btRegister">Register</string>
     <string name="btYes">Yes</string>
     <string name="btNo">No</string>
+    <string name="btSave">Save</string>
+    <string name="btCancel">Cancel</string>
     
     <!-- Check Boxes -->
     <string name="cbAllowTrack">Allow tracking of this device</string>
@@ -34,7 +39,13 @@
     <string name="mgEnterName">Enter a device name before registering your device.</string>
     <string name="mgAllowTracking">If you decide allow tracking of this device, it will occasionally check-in with Mozilla servers which will store your device\'s most recent known location. This will be done in a secure manner and Mozilla will only store your device\'s most recent location. For more information see [device manager website here]. \n\nIs Mozilla storing this information okay with you?</string>
     
+    <!-- Menus -->
+    <string name="mnSettings">Settings</string>
+    <string name="mnAbout">About</string>
+    
     <!-- Defaults -->
     <string name="dfLatLong">0.0000</string>
     <string name="dfLocTime">Never</string>
+    <string name="dfLocationUpdateFrequency">3600</string>
+    <string name="dfServerAddress">http://10.0.2.2:8000</string>
 </resources>

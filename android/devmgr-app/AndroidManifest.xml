@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     -->
     <application 
-        android:name=".tools.DMApplication"
+        android:name=".base.DMApplication"
         android:icon="@drawable/icon"
         android:label="@string/app_name">
         <!-- C2DM stuff commented out -->
@@ -46,18 +46,20 @@
 	    
 	    <!-- Service for getting the device's location -->
 	    <service 
-            android:name=".LocationUpdateService"
+            android:name=".services.LocationUpdateService"
             android:enabled="true"
 	        android:exported="true">
 	    </service>
         
         <!-- Declaration for main activity, set it to launch when app is started -->    
-        <activity android:name=".StartActivity"
+        <activity android:name=".activities.StartActivity"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activities.SettingsActivity">
         </activity>
     </application>
 </manifest>

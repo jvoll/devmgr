@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
-import com.mozilla.android.devmgr.Constants;
+import com.mozilla.android.devmgr.tools.Constants;
 
 public class C2DMessaging {
 

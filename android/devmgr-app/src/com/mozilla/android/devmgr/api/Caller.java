@@ -18,14 +18,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mozilla.android.devmgr.Constants;
-import com.mozilla.android.devmgr.Utilities;
-
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
+
+import com.mozilla.android.devmgr.tools.Constants;
+import com.mozilla.android.devmgr.tools.Utilities;
 
 public class Caller {
 	
@@ -34,14 +33,12 @@ public class Caller {
 	// TODO: potential problems with printing error messages (if message is null)
 	
 	// Webservice Information
-	// TODO: use a config file for this stuff
-	private static final String API_URL = "http://10.0.2.2:8000/api/";
-	private static final String REGISTER_API = "register";
-	private static final String REGISTER_C2DM_ID_API ="c2dm/%id/register";
-	private static final String LOCATION_API = "%id/location";
-	private static final String ALLOW_TRACK_API = "%id/allowtrack";
-	private static final String WIPE_API = "%id/wipestatus";
-	private static final String LOCATION_FREQUENCY_API = "%id/trackfrequency";
+	private static final String REGISTER_API = "/api/register";
+	private static final String REGISTER_C2DM_ID_API ="/api/c2dm/%id/register";
+	private static final String LOCATION_API = "/api/%id/location";
+	private static final String ALLOW_TRACK_API = "/api/%id/allowtrack";
+	private static final String WIPE_API = "/api/%id/wipestatus";
+	private static final String LOCATION_FREQUENCY_API = "/api/%id/trackfrequency";
 	
 	// Disable ability to instantiate this class
 	private Caller() {}
@@ -51,7 +48,7 @@ public class Caller {
 		
 		// Prepare the request
 		String jsonString = "{\"name\":\"" + deviceName + "\"}";
-		HttpPost httpPost = new HttpPost(API_URL + REGISTER_API);
+		HttpPost httpPost = new HttpPost(getApiUrl(context) + REGISTER_API);
 		httpPost.addHeader("Content-Type", "application/json");
 		try {
 			httpPost.setEntity(new StringEntity(jsonString));
@@ -81,7 +78,7 @@ public class Caller {
 		
 		// Prepare the request
 		String jsonString = "{\"google_id\":\"" + id + "\"}";
-		HttpPut httpPut = new HttpPut(API_URL + REGISTER_C2DM_ID_API.replace("%id", getDeviceID(context)));
+		HttpPut httpPut = new HttpPut(getApiUrl(context) + REGISTER_C2DM_ID_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
 			httpPut.setEntity(new StringEntity(jsonString));
@@ -102,7 +99,7 @@ public class Caller {
 		// Prepare the request
 		String jsonString = "{\"latitude\":" + location.getLatitude() + ", \"longitude\":" + location.getLongitude()
 							+ ", \"loc_timestamp\":" + location.getTime() + "}";
-		HttpPut httpPut = new HttpPut(API_URL + LOCATION_API.replace("%id", getDeviceID(context)));
+		HttpPut httpPut = new HttpPut(getApiUrl(context) + LOCATION_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
 			httpPut.setEntity(new StringEntity(jsonString));
@@ -122,7 +119,7 @@ public class Caller {
 		
 		// Prepare the request
 		String jsonString = "{\"allow_tracking\":\"" + allowTrack + "\"}";
-		HttpPut httpPut = new HttpPut(API_URL + ALLOW_TRACK_API.replace("%id", getDeviceID(context)));
+		HttpPut httpPut = new HttpPut(getApiUrl(context) + ALLOW_TRACK_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
 			httpPut.setEntity(new StringEntity(jsonString));
@@ -141,7 +138,7 @@ public class Caller {
 	public static boolean checkWipeRequest(Context context) {
 		
 		// Prepare the request
-		HttpGet httpGet = new HttpGet(API_URL + WIPE_API.replace("%id", getDeviceID(context)));
+		HttpGet httpGet = new HttpGet(getApiUrl(context) + WIPE_API.replace("%id", getDeviceID(context)));
 		
 		// Make the call
 		HttpResponse response = makeHttpCall(httpGet);
@@ -167,7 +164,7 @@ public class Caller {
 	public static int getLocationUpdateFrequency(Context context) {
 		
 		// Prepare the request
-		HttpGet httpGet = new HttpGet(API_URL + LOCATION_FREQUENCY_API.replace("%id", getDeviceID(context)));
+		HttpGet httpGet = new HttpGet(getApiUrl(context) + LOCATION_FREQUENCY_API.replace("%id", getDeviceID(context)));
 		
 		// Make the call
 		HttpResponse response = makeHttpCall(httpGet);
@@ -195,7 +192,7 @@ public class Caller {
 		
 		// Prepare the request
 		String jsonString = "{\"track_frequency\":\"" + frequency + "\"}";
-		HttpPut httpPut = new HttpPut(API_URL + LOCATION_FREQUENCY_API.replace("%id", getDeviceID(context)));
+		HttpPut httpPut = new HttpPut(getApiUrl(context) + LOCATION_FREQUENCY_API.replace("%id", getDeviceID(context)));
 		httpPut.addHeader("Content-Type", "application/json");
 		try {
 			httpPut.setEntity(new StringEntity(jsonString));
@@ -219,6 +216,8 @@ public class Caller {
 		
 		try {
 			response = httpClient.execute(request);
+		} catch (IllegalArgumentException e) {
+			Log.e(ERROR_TAG, e.getMessage());
 		} catch (ClientProtocolException e) {
 			Log.e(ERROR_TAG, e.getMessage());
 		} catch (IOException e) {
@@ -264,5 +263,14 @@ public class Caller {
 			return false;
 		}
 		return true;
+	}
+	
+	// Helper to get the API URL
+	private static String getApiUrl(Context context) {
+		String url = Utilities.getSharedPrefString(context, Constants.KEY_SERVER_ADDRESS);
+		if (url.equalsIgnoreCase(Utilities.SP_DEFAULT_STRING)) {
+			url = Constants.DEFAULT_API_URL;
+		}
+		return url;
 	}
 }

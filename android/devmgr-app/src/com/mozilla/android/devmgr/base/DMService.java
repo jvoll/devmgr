@@ -1,4 +1,4 @@
-package com.mozilla.android.devmgr.tools;
+package com.mozilla.android.devmgr.base;
 
 import android.app.Service;
 import android.content.Intent;
