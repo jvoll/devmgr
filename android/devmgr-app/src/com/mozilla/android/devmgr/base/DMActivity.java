@@ -1,6 +1,7 @@
 package com.mozilla.android.devmgr.base;
 
 import com.mozilla.android.devmgr.R;
+import com.mozilla.android.devmgr.activities.AboutActivity;
 import com.mozilla.android.devmgr.activities.SettingsActivity;
 
 import android.app.Activity;
@@ -50,6 +51,6 @@ public class DMActivity extends Activity {
 	}
 	
 	private void showAbout() {
-		
+		startActivity(new Intent(this, AboutActivity.class));
 	}
 }

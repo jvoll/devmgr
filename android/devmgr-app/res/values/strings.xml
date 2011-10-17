@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Info -->
     <string name="app_name">Mozilla Device Manager</string>
+    <string name="tvVersion">Version 1.0</string>
     
     <!-- Control Labels -->
     <string name="tvWipeStatus">Wipe status: </string>
@@ -16,6 +18,10 @@
     <string name="tvServerAddress">Server Address</string>
     <string name="tvLocationUpdateFrequency">Location Update Frequency (seconds)</string>
     <string name="tvTrackingDisabled">You must enable device tracking to change this.</string>
+    <string name="tvAboutTitle">About</string>
+    <string name="tvAboutInfo">This app enables users to track and remotely reset factory defaults on a device.</string>
+    <string name="tvDebugInfo">Debug and Testing Info</string>
+    <string name="tvDeviceId">Device ID:</string>
     
     <!--  Buttons -->
     <string name="btRegister">Register</string>
@@ -23,6 +29,7 @@
     <string name="btNo">No</string>
     <string name="btSave">Save</string>
     <string name="btCancel">Cancel</string>
+    <string name="btResetRegistration">Reset Registration</string>
     
     <!-- Check Boxes -->
     <string name="cbAllowTrack">Allow tracking of this device</string>
@@ -48,4 +55,5 @@
     <string name="dfLocTime">Never</string>
     <string name="dfLocationUpdateFrequency">3600</string>
     <string name="dfServerAddress">http://10.0.2.2:8000</string>
+    <string name="dfDeviceId">Not registered, no ID assigned</string>
 </resources>

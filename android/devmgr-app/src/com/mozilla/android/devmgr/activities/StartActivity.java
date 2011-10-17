@@ -28,6 +28,7 @@ import com.mozilla.android.devmgr.tools.Utilities;
 public class StartActivity extends DMActivity implements MessageHandler {
 	
 	Handler messageHandler;
+	boolean disableHandlerFlag = false;
 	
 	// UI Components
 	ViewSwitcher vsRegister;
@@ -70,39 +71,19 @@ public class StartActivity extends DMActivity implements MessageHandler {
         tvLongitude = (TextView) findViewById(R.id.tvLongitudeValue);
         tvLocTime = (TextView) findViewById(R.id.tvLocTimeValue);
         
-        // Switch the view if this device is already registered
-        if (!Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME).equalsIgnoreCase("")) {
-        	View button = vsRegister.getCurrentView().findViewById(R.id.btRegister);
-        	if (button != null) {
-        		vsRegister.showNext();
-        	}
-        	
-        	// Display device name
-        	TextView tvNameValue = (TextView) findViewById(R.id.tvNameValue);
-			tvNameValue.setText(Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME));
-			
-			// Enable allow tracking and set it appropriately
-			cbAllowTrack.setEnabled(true);
-			boolean allowTrack = Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK);
-			cbAllowTrack.setChecked(allowTrack);
+        // Kill the service, if it is enabled we will restart it (so user can see it is working)
+        LocationUpdateService.stopServiceAndAlarm(this);
+        
+        // Setup tracking if it is enabled
+        if (Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK)) {
+	        // Subscribe to messages from the service
+	        getAppContext().subscribeMessages(this);
 	        
-	        // Set the last reported location
-	        updateGUILocation();
-	        
-	        // Setup tracking if it is enabled
-	        if (allowTrack) {
-		        // Subscribe to messages from the service
-		        getAppContext().subscribeMessages(this);
-		        
-		        // Restart the service in case it isn't running,
-		        // even if it is, we'd like to get a new location since user
-		        // is using the app and we want to show them responsiveness.
-		        LocationUpdateService.stopServiceAndAlarm(this);
-		        LocationUpdateService.startService(this);
-	        }
-	        
+	        // Restart the service in case it isn't running,
+	        LocationUpdateService.startService(this);
         } else {
-	        cbAllowTrack.setEnabled(false);
+        	// Unsubscribe from messages from the service
+        	getAppContext().unsubscribeMessages(this);
         }
         
         // Tracking checkbox handler
@@ -111,6 +92,12 @@ public class StartActivity extends DMActivity implements MessageHandler {
 				trackingCheckChange(buttonView, isChecked);
 			}
 		});
+    }
+    
+    @Override
+    protected void onResume() {
+    	super.onResume();
+    	setUIValues();
     }
     
     ////////////////////////////// HANDLERS ////////////////////////////////////
@@ -146,6 +133,9 @@ public class StartActivity extends DMActivity implements MessageHandler {
     
     // Handler for the Allow tracking checkbox
     private void trackingCheckChange(CompoundButton buttonView, boolean isChecked) {
+    	
+    	// No need to handle this event, just setting up UI
+    	if (disableHandlerFlag) return;
     	
     	// Update preferences on the server
         if (!Caller.updateAllowTrack(this, isChecked)) {
@@ -201,6 +191,53 @@ public class StartActivity extends DMActivity implements MessageHandler {
 		// Remove this as a listener
 		getAppContext().unsubscribeMessages(this);
 		
+    }
+    
+    private void setUIValues() {
+        // Set this flag so that handlers aren't triggered when we check/uncheck the checkbox
+    	// They are unnecessary because we are loading settings that are already saved to set the box
+        disableHandlerFlag = true;
+        
+        // Clear the device name edit text
+        EditText etName = (EditText) findViewById(R.id.etName);
+        etName.setText("");
+        
+        // Set the last reported location
+        updateGUILocation();
+        
+        // Switch the view if this device is already registered
+        View btRegister = vsRegister.getCurrentView().findViewById(R.id.btRegister);
+        if (Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME).equalsIgnoreCase(Utilities.SP_DEFAULT_STRING)) {
+	        
+	        // Switch view switcher if necessary
+        	if (btRegister == null) {
+        		vsRegister.showNext();
+        	}
+        	
+        	// Disable allow track
+			cbAllowTrack.setChecked(false);
+	        cbAllowTrack.setEnabled(false);
+        	
+        } else {
+        	
+	        // Switch view switcher if necessary
+        	if (btRegister != null) {
+        		vsRegister.showNext();
+        	}
+        	
+        	// Display device name
+	    	TextView tvNameValue = (TextView) findViewById(R.id.tvNameValue);
+			tvNameValue.setText(Utilities.getSharedPrefString(this, Constants.KEY_DEVICE_NAME));
+			
+			// Enable allow tracking and set it appropriately
+			cbAllowTrack.setEnabled(true);
+			boolean allowTrack = Utilities.getSharedPrefBool(this, Constants.KEY_ALLOW_TRACK);
+			cbAllowTrack.setChecked(allowTrack);
+	        
+        }
+        
+        disableHandlerFlag = false;
+        
     }
     
 	private void updateGUILocation() {

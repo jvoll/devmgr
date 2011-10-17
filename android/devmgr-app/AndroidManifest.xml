@@ -59,7 +59,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Settings Activity -->
         <activity android:name=".activities.SettingsActivity">
+        </activity>
+        
+        <!-- About Activity -->
+        <activity android:name=".activities.AboutActivity">
         </activity>
     </application>
 </manifest>

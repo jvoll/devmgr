@@ -7,8 +7,8 @@ public interface Constants {
 	public static final String KEY_DEVICE_ID = "com.mozilla.android.devmgr.id";
 	public static final String KEY_ALLOW_TRACK = "com.mozilla.android.devmgr.track";
 	public static final String KEY_DEVICE_NAME = "com.mozilla.android.devmgr.name";
-	public static final String KEY_SERVER_ADDRESS = "com.mozilla.android.devmgr.server_address";
 	public static final String KEY_LOC_UPDATE_FREQUENCY = "com.mozilla.android.devmgr.loc_update_frequency";
+	public static final String KEY_SERVER_ADDRESS = "com.mozilla.android.devmgr.server_address";
 	
 	// Constants for service to activity messages
 	public static final int MESSAGE_LOCATION_UPDATE = 100;

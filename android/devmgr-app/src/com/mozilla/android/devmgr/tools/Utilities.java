@@ -16,7 +16,10 @@ public class Utilities {
 	
 	// Defines what is returned when there is no value set of a shared pref
 	public static final String SP_DEFAULT_STRING = "";
-	public static final int SP_DEFAULT_INT = -1;
+	public static final int SP_DEFAULT_INT = 0;
+	public static final float SP_DEFAULT_FLOAT = 0;
+	public static final long SP_DEFAULT_LONG = 0;
+	public static final boolean SP_DEFAULT_BOOL = false;
 	
 	// Edit a shared preference (a persistent storage mechanism)
 	public static void editSharedPref(Context context, String key, String value) {
@@ -56,6 +59,17 @@ public class Utilities {
 		SharedPreferences prefs = context.getSharedPreferences(Constants.KEY_PREFS_FILE, Context.MODE_PRIVATE);
 		return prefs.getInt(key, SP_DEFAULT_INT);
 	}
+	
+	// Reset shared preferences to defaults
+	public static void resetSharedPreferences(Context context) {
+		Editor editor = getEditor(context);
+		editor.putString(Constants.KEY_DEVICE_ID, SP_DEFAULT_STRING);
+		editor.putBoolean(Constants.KEY_ALLOW_TRACK, SP_DEFAULT_BOOL);
+		editor.putString(Constants.KEY_DEVICE_NAME, SP_DEFAULT_STRING);
+		editor.putInt(Constants.KEY_LOC_UPDATE_FREQUENCY, SP_DEFAULT_INT);
+		resetLocation(editor);
+		editor.commit();
+	}
 
 	// Save last location to persistent storage
 	public static void saveLocation(Context context, Location location) {
@@ -67,13 +81,18 @@ public class Utilities {
 			editor.putFloat(KEY_LOC_ACCURACY, location.getAccuracy());
 			editor.putLong(KEY_LOC_TIME, location.getTime());
 		} else {
-			editor.putFloat(KEY_LOC_LAT, 0);
-			editor.putFloat(KEY_LOC_LONG, 0);
-			editor.putString(KEY_LOC_PROVIDER, "None");
-			editor.putFloat(KEY_LOC_ACCURACY, 0);
-			editor.putLong(KEY_LOC_TIME, 0);
+			resetLocation(editor);
 		}
 		editor.commit();		
+	}
+	
+	// Reset location information
+	private static void resetLocation(Editor editor) {
+		editor.putFloat(KEY_LOC_LAT, SP_DEFAULT_FLOAT);
+		editor.putFloat(KEY_LOC_LONG, SP_DEFAULT_FLOAT);
+		editor.putString(KEY_LOC_PROVIDER, SP_DEFAULT_STRING);
+		editor.putFloat(KEY_LOC_ACCURACY, SP_DEFAULT_FLOAT);
+		editor.putLong(KEY_LOC_TIME, SP_DEFAULT_LONG);
 	}
 	
 	// Get last location from persistent storage
