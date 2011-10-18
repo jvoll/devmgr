@@ -1,2 +1,6 @@
 *.pyc
 *.swp
+bin
+build
+lib
+lib64

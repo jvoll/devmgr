@@ -7,3 +7,15 @@ Superuser info for Django auth system:
 user: jason
 email: jvoll@mozilla.com
 password: password
+
+Setup Instructions
+1. Install python-setuptools, easy_install virutalenv (if not already installed).
+2. Git clone repo: git@github.com:jvoll/devmgr.git
+3. Create a new virtual env (virtual_env --no-site-packages devmgr)
+4. Install mysql: yum install mysql-server mysql
+5. Setup mysql root user: mysql-u root -p mocodevmgr
+6. Create database devmgr
+7. Create mysql user for django with credentials specified in settings.py
+8. pip install django 
+9. yum install python-devel
+10. easy_install MySQL-python

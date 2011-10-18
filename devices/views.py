@@ -3,7 +3,7 @@ from devices.models import Device
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from devmgr.c2dm.c2dm_sender import C2DMSender
+#from devmgr.c2dm.c2dm_sender import C2DMSender
 from django import forms
 from devices.forms import *
 
